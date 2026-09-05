@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Student - CampusVision AI</title>
+</head>
+
+<body>
+
+<h1>Edit Student</h1>
+
+<form method="POST">
+
+    <label>Student ID:</label><br>
+    <input type="text" name="student_id"
+           value="{{ student['student_id'] }}" required>
+    <br><br>
+
+    <label>Name:</label><br>
+    <input type="text" name="name"
+           value="{{ student['name'] }}" required>
+    <br><br>
+
+    <label>Email:</label><br>
+    <input type="email" name="email"
+           value="{{ student['email'] }}">
+    <br><br>
+
+    <label>Department:</label><br>
+    <input type="text" name="department"
+           value="{{ student['department'] }}">
+    <br><br>
+
+    <label>Year:</label><br>
+    <input type="number" name="year"
+           value="{{ student['year'] }}" min="1" max="5">
+    <br><br>
+
+    <button type="submit">Update Student</button>
+
+</form>
+
+<br>
+
+<a href="{{ url_for('student.students') }}">
+    Back to Students
+</a>
+
+</body>
+</html>
