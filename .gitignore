@@ -1,0 +1,18 @@
+# Virtual Environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment Variables
+.env
+
+# Database
+*.db
+
+# Uploaded Face Images
+uploads/faces/
+
+# IDE
+.vscode/
