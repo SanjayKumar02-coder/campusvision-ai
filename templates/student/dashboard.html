@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard - CampusVision AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="header">
+        <h1>🎓 CampusVision AI</h1>
+        <p>Student Management & Attendance Dashboard</p>
+    </div>
+
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>👨‍🎓 Total Students</h3>
+            <p>{{ total_students }}</p>
+        </div>
+
+        <div class="card">
+            <h3>📅 Attendance Records</h3>
+            <p>{{ total_attendance }}</p>
+        </div>
+
+        <div class="card">
+            <h3>✅ Present</h3>
+            <p>{{ present_count }}</p>
+        </div>
+
+        <div class="card">
+            <h3>❌ Absent</h3>
+            <p>{{ absent_count }}</p>
+        </div>
+
+    </div>
+
+
+    <div class="actions">
+
+        <h2>Quick Actions</h2>
+
+        <a href="{{ url_for('student.add_student') }}">
+            ➕ Add Student
+        </a>
+
+        <a href="{{ url_for('student.students') }}">
+            👨‍🎓 View Students
+        </a>
+
+        <a href="{{ url_for('student.attendance') }}">
+            📅 Attendance
+        </a>
+
+        <a href="{{ url_for('student.attendance_summary') }}">
+            📊 Attendance Summary
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

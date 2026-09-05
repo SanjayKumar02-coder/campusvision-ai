@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Attendance Summary - CampusVision AI</title>
+</head>
+
+<body>
+
+<h1>📊 Attendance Summary</h1>
+
+<hr>
+
+{% if summary %}
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>Student ID</th>
+        <th>Total Classes</th>
+        <th>Present</th>
+        <th>Absent</th>
+        <th>Attendance %</th>
+    </tr>
+
+    {% for student in summary %}
+
+    <tr>
+        <td>{{ student["student_id"] }}</td>
+        <td>{{ student["total_classes"] }}</td>
+        <td>{{ student["present"] }}</td>
+        <td>{{ student["absent"] }}</td>
+
+        <td>
+            {% if student["total_classes"] > 0 %}
+                {{ "%.2f"|format((student["present"] / student["total_classes"]) * 100) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </td>
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+
+<p>No attendance records found.</p>
+
+{% endif %}
+
+<br>
+
+<a href="{{ url_for('student.attendance') }}">
+    ← Back to Attendance
+</a>
+
+</body>
+
+</html>

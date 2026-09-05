@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Attendance - CampusVision AI</title>
+</head>
+
+<body>
+
+<h1>Student Attendance</h1>
+
+<hr>
+
+<form method="POST">
+
+    <label>Student ID:</label><br>
+    <input type="text" name="student_id" placeholder="Enter Student ID" required>
+    <br><br>
+
+    <label>Date:</label><br>
+    <input type="date" name="date" required>
+    <br><br>
+
+    <label>Status:</label><br>
+
+    <input type="radio" name="status" value="Present" required>
+    <label>✅ Present</label>
+
+    <br>
+
+    <input type="radio" name="status" value="Absent">
+    <label>❌ Absent</label>
+
+    <br><br>
+
+    <button type="submit">Save Attendance</button>
+
+</form>
+<hr>
+
+<h2>Attendance Records</h2>
+
+{% if attendance_records %}
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>ID</th>
+        <th>Student ID</th>
+        <th>Date</th>
+        <th>Status</th>
+    </tr>
+
+    {% for record in attendance_records %}
+
+    <tr>
+        <td>{{ record["id"] }}</td>
+        <td>{{ record["student_id"] }}</td>
+        <td>{{ record["date"] }}</td>
+        <td>{{ record["status"] }}</td>
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+
+<p>No attendance records found.</p>
+
+{% endif %}
+
+<hr>
+
+<a href="{{ url_for('student.students') }}">
+    Back to Students
+</a>
+
+</body>
+
+</html>

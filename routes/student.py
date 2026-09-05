@@ -126,3 +126,90 @@ def edit_student(id):
     connection.close()
 
     return render_template("student/edit_student.html", student=student)
+
+# Attendance
+@student_bp.route("/attendance", methods=["GET", "POST"])
+def attendance():
+
+    connection = get_db_connection()
+
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+        date = request.form["date"]
+        status = request.form["status"]
+
+        connection.execute("""
+            INSERT INTO attendance
+            (student_id, date, status)
+            VALUES (?, ?, ?)
+        """, (student_id, date, status))
+
+        connection.commit()
+
+    attendance_records = connection.execute("""
+        SELECT * FROM attendance
+        ORDER BY id DESC
+    """).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "student/attendance.html",
+        attendance_records=attendance_records
+    )
+
+# Attendance Summary
+@student_bp.route("/attendance/summary")
+def attendance_summary():
+
+    connection = get_db_connection()
+
+    summary = connection.execute("""
+        SELECT
+            student_id,
+            COUNT(*) AS total_classes,
+            SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) AS present,
+            SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) AS absent
+        FROM attendance
+        GROUP BY student_id
+        ORDER BY student_id
+    """).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "student/attendance_summary.html",
+        summary=summary
+    )
+
+# Student Dashboard
+@student_bp.route("/dashboard")
+def dashboard():
+
+    connection = get_db_connection()
+
+    total_students = connection.execute(
+        "SELECT COUNT(*) AS count FROM students"
+    ).fetchone()["count"]
+
+    total_attendance = connection.execute(
+        "SELECT COUNT(*) AS count FROM attendance"
+    ).fetchone()["count"]
+
+    present_count = connection.execute(
+        "SELECT COUNT(*) AS count FROM attendance WHERE status = 'Present'"
+    ).fetchone()["count"]
+
+    absent_count = connection.execute(
+        "SELECT COUNT(*) AS count FROM attendance WHERE status = 'Absent'"
+    ).fetchone()["count"]
+
+    connection.close()
+
+    return render_template(
+        "student/dashboard.html",
+        total_students=total_students,
+        total_attendance=total_attendance,
+        present_count=present_count,
+        absent_count=absent_count
+    )
