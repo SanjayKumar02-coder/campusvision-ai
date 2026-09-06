@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Dashboard - CampusVision AI</title>
+</head>
+
+<body>
+
+    <h1>👨‍💼 Admin Dashboard</h1>
+
+    <p>
+        Welcome, <strong>{{ session["username"] }}</strong>
+    </p>
+
+    <p>
+        Role: <strong>{{ session["role"] }}</strong>
+    </p>
+
+    <hr>
+
+    <h2>📊 Administration</h2>
+
+    <ul>
+        <li>
+            <a href="{{ url_for('student.students') }}">
+                👨‍🎓 Manage Students
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('student.attendance') }}">
+                📅 View Attendance
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('student.attendance_summary') }}">
+                📊 Attendance Summary
+            </a>
+        </li>
+    </ul>
+
+    <hr>
+
+    <a href="{{ url_for('auth.logout') }}">
+        🚪 Logout
+    </a>
+
+</body>
+
+</html>

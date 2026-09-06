@@ -1,18 +1,58 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from database.db import get_db_connection
+
 
 student_bp = Blueprint("student", __name__, url_prefix="/students")
 
 
-# View all students
+# =========================================================
+# LOGIN PROTECTION
+# =========================================================
+
+def login_required():
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    return None
+
+
+# =========================================================
+# ADMIN + FACULTY PROTECTION
+# =========================================================
+
+def staff_required():
+
+    check = login_required()
+
+    if check:
+        return check
+
+    if session["role"] not in ["admin", "faculty"]:
+        return "Access Denied", 403
+
+    return None
+
+
+# =========================================================
+# VIEW STUDENTS
+# ADMIN + FACULTY
+# =========================================================
+
 @student_bp.route("/")
 def students():
+
+    check = staff_required()
+
+    if check:
+        return check
 
     search = request.args.get("search", "")
 
     connection = get_db_connection()
 
     if search:
+
         students = connection.execute("""
             SELECT * FROM students
             WHERE student_id LIKE ?
@@ -24,7 +64,9 @@ def students():
             f"%{search}%",
             f"%{search}%"
         )).fetchall()
+
     else:
+
         students = connection.execute(
             "SELECT * FROM students ORDER BY id DESC"
         ).fetchall()
@@ -32,26 +74,27 @@ def students():
     connection.close()
 
     return render_template(
-        "student/students.html",
+        "admin/students.html",
         students=students,
         search=search
     )
-    connection = get_db_connection()
-
-    students = connection.execute(
-        "SELECT * FROM students ORDER BY id DESC"
-    ).fetchall()
-
-    connection.close()
-
-    return render_template("student/students.html", students=students)
 
 
-# Add student
+# =========================================================
+# ADD STUDENT
+# ADMIN + FACULTY
+# =========================================================
+
 @student_bp.route("/add", methods=["GET", "POST"])
 def add_student():
 
+    check = staff_required()
+
+    if check:
+        return check
+
     if request.method == "POST":
+
         student_id = request.form["student_id"]
         name = request.form["name"]
         email = request.form["email"]
@@ -64,39 +107,41 @@ def add_student():
             INSERT INTO students
             (student_id, name, email, department, year)
             VALUES (?, ?, ?, ?, ?)
-        """, (student_id, name, email, department, year))
+        """, (
+            student_id,
+            name,
+            email,
+            department,
+            year
+        ))
 
         connection.commit()
         connection.close()
 
         return redirect(url_for("student.students"))
 
-    return render_template("student/add_student.html")
-
-
-# Delete student
-@student_bp.route("/delete/<int:id>")
-def delete_student(id):
-
-    connection = get_db_connection()
-
-    connection.execute(
-        "DELETE FROM students WHERE id = ?",
-        (id,)
+    return render_template(
+        "admin/add_student.html"
     )
 
-    connection.commit()
-    connection.close()
 
-    return redirect(url_for("student.students"))
+# =========================================================
+# EDIT STUDENT
+# ADMIN + FACULTY
+# =========================================================
 
-# Edit student
 @student_bp.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit_student(id):
+
+    check = staff_required()
+
+    if check:
+        return check
 
     connection = get_db_connection()
 
     if request.method == "POST":
+
         student_id = request.form["student_id"]
         name = request.form["name"]
         email = request.form["email"]
@@ -111,7 +156,14 @@ def edit_student(id):
                 department = ?,
                 year = ?
             WHERE id = ?
-        """, (student_id, name, email, department, year, id))
+        """, (
+            student_id,
+            name,
+            email,
+            department,
+            year,
+            id
+        ))
 
         connection.commit()
         connection.close()
@@ -125,15 +177,55 @@ def edit_student(id):
 
     connection.close()
 
-    return render_template("student/edit_student.html", student=student)
+    return render_template(
+        "admin/edit_student.html",
+        student=student
+    )
 
-# Attendance
+
+# =========================================================
+# DELETE STUDENT
+# ADMIN + FACULTY
+# =========================================================
+
+@student_bp.route("/delete/<int:id>")
+def delete_student(id):
+
+    check = staff_required()
+
+    if check:
+        return check
+
+    connection = get_db_connection()
+
+    connection.execute(
+        "DELETE FROM students WHERE id = ?",
+        (id,)
+    )
+
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for("student.students"))
+
+
+# =========================================================
+# ATTENDANCE
+# ADMIN + FACULTY
+# =========================================================
+
 @student_bp.route("/attendance", methods=["GET", "POST"])
 def attendance():
+
+    check = staff_required()
+
+    if check:
+        return check
 
     connection = get_db_connection()
 
     if request.method == "POST":
+
         student_id = request.form["student_id"]
         date = request.form["date"]
         status = request.form["status"]
@@ -142,7 +234,11 @@ def attendance():
             INSERT INTO attendance
             (student_id, date, status)
             VALUES (?, ?, ?)
-        """, (student_id, date, status))
+        """, (
+            student_id,
+            date,
+            status
+        ))
 
         connection.commit()
 
@@ -154,13 +250,23 @@ def attendance():
     connection.close()
 
     return render_template(
-        "student/attendance.html",
+        "admin/attendance.html",
         attendance_records=attendance_records
     )
 
-# Attendance Summary
+
+# =========================================================
+# ATTENDANCE SUMMARY
+# ADMIN + FACULTY
+# =========================================================
+
 @student_bp.route("/attendance/summary")
 def attendance_summary():
+
+    check = staff_required()
+
+    if check:
+        return check
 
     connection = get_db_connection()
 
@@ -168,8 +274,20 @@ def attendance_summary():
         SELECT
             student_id,
             COUNT(*) AS total_classes,
-            SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) AS present,
-            SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) AS absent
+            SUM(
+                CASE
+                    WHEN status = 'Present'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS present,
+            SUM(
+                CASE
+                    WHEN status = 'Absent'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS absent
         FROM attendance
         GROUP BY student_id
         ORDER BY student_id
@@ -178,13 +296,22 @@ def attendance_summary():
     connection.close()
 
     return render_template(
-        "student/attendance_summary.html",
+        "admin/attendance_summary.html",
         summary=summary
     )
 
-# Student Dashboard
+
+# =========================================================
+# STUDENT DASHBOARD
+# =========================================================
+
 @student_bp.route("/dashboard")
 def dashboard():
+
+    check = login_required()
+
+    if check:
+        return check
 
     connection = get_db_connection()
 
@@ -197,11 +324,19 @@ def dashboard():
     ).fetchone()["count"]
 
     present_count = connection.execute(
-        "SELECT COUNT(*) AS count FROM attendance WHERE status = 'Present'"
+        """
+        SELECT COUNT(*) AS count
+        FROM attendance
+        WHERE status = 'Present'
+        """
     ).fetchone()["count"]
 
     absent_count = connection.execute(
-        "SELECT COUNT(*) AS count FROM attendance WHERE status = 'Absent'"
+        """
+        SELECT COUNT(*) AS count
+        FROM attendance
+        WHERE status = 'Absent'
+        """
     ).fetchone()["count"]
 
     connection.close()

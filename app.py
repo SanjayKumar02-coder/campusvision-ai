@@ -1,10 +1,20 @@
 from flask import Flask
 from database.db import get_db_connection
 from routes.student import student_bp
+from routes.auth import auth_bp
+from routes.admin import admin_bp
+from routes.faculty import faculty_bp
+from routes.user_management import user_management_bp
 
 app = Flask(__name__)
-app.register_blueprint(student_bp)
 
+app.secret_key = "campusvision-secret-key"
+
+app.register_blueprint(student_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(admin_bp)
+app.register_blueprint(faculty_bp)
+app.register_blueprint(user_management_bp)
 
 @app.route("/")
 def home():

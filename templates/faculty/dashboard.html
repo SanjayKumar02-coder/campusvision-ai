@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Faculty Dashboard - CampusVision AI</title>
+</head>
+
+<body>
+
+    <h1>👨‍🏫 Faculty Dashboard</h1>
+
+    <p>
+        Welcome, <strong>{{ session["username"] }}</strong>
+    </p>
+
+    <p>
+        Role: <strong>{{ session["role"] }}</strong>
+    </p>
+
+    <hr>
+
+    <h2>📚 Faculty Actions</h2>
+
+    <ul>
+
+        <li>
+            <a href="{{ url_for('student.students') }}">
+                👨‍🎓 View Students
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('student.attendance') }}">
+                📅 Manage Attendance
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('student.attendance_summary') }}">
+                📊 Attendance Summary
+            </a>
+        </li>
+
+    </ul>
+
+    <hr>
+
+    <a href="{{ url_for('auth.logout') }}">
+        🚪 Logout
+    </a>
+
+</body>
+
+</html>

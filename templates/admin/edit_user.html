@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit User - CampusVision AI</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .back {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>✏️ Edit User</h1>
+
+    <form method="POST">
+
+        <label>Username:</label>
+
+        <input
+            type="text"
+            name="username"
+            value="{{ user['username'] }}"
+            required
+        >
+
+        <label>Password:</label>
+
+        <input
+            type="text"
+            name="password"
+            value="{{ user['password'] }}"
+            required
+        >
+
+        <label>Role:</label>
+
+        <select name="role" required>
+
+            <option value="admin"
+                {% if user['role'] == 'admin' %}selected{% endif %}>
+                Admin
+            </option>
+
+            <option value="faculty"
+                {% if user['role'] == 'faculty' %}selected{% endif %}>
+                Faculty
+            </option>
+
+            <option value="student"
+                {% if user['role'] == 'student' %}selected{% endif %}>
+                Student
+            </option>
+
+        </select>
+
+        <button type="submit">
+            💾 Update User
+        </button>
+
+    </form>
+
+    <a class="back"
+       href="{{ url_for('user_management.users') }}">
+        ← Back to User Management
+    </a>
+
+</div>
+
+</body>
+</html>
